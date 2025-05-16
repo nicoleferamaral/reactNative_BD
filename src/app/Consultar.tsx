@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { ClienteDataBase, useClienteDataBase } from "@/database/useClienteDataBase";
 import { FlatList } from "react-native";
 import { Cliente } from "@/components/Cliente";
+import Atualizar from "./Atualizar";
 
 // Todos q são telas tsx, aqueles que não são telas ts
 
@@ -41,6 +42,16 @@ export default function Consultar(){
         setEndereco(item.endereco)
     }
 
+    async function remove(id:number) {
+        try {
+            await clienteDatabase.remove(id)
+            await list()
+        } catch (error) {
+            console.log(error)
+        }
+      
+    }
+
 
     useEffect(()=> {list()}, [busca])
 
@@ -49,12 +60,14 @@ export default function Consultar(){
     return(
         <View style={styles.container}>
             <Campos placeholder="Pesquisar" onChangeText={setBusca} />
+            <View style={styles.flat}>
             <FlatList 
                 data={cliente}
                 keyExtractor={(item) => String(item.id)}
-                renderItem={(item) =>  <Cliente data={item}/>}
+                renderItem={({item}) =>  <Cliente data={item} onDelete={() => remove(item.id)} onEdit={() => navigation.navigate('Atualizar', {item})} />}
                 contentContainerStyle={{gap:16}}
             />
+            </View>
             <Button title="Voltar" onPress={() => navigation.navigate('Index')} /> 
         </View>
     );
@@ -69,6 +82,15 @@ const styles = StyleSheet.create({
         width:"100%",
         height: "100%",
         justifyContent: "center",
+    },
+    flat:{
+        width: "100%",
+        height: "50%",
+        backgroundColor: "#fff",
+        marginTop: 20,
+        marginBottom: 30,
+        paddingTop: 20,
+        paddingBottom: 20,
     },
    
 });

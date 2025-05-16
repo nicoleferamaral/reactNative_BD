@@ -38,7 +38,7 @@ export function useClienteDataBase(){
 
     async function consultar(name:string) {
         try{
-            const query = "select * from where nome like ?" //? substituir por qualquer item de busca
+            const query = "select * from pessoa where nome like ?" //? substituir por qualquer item de busca
             const response = await database.getAllAsync<ClienteDataBase>(query,`%${name}%`)
             return response
         }catch(error){
@@ -47,5 +47,33 @@ export function useClienteDataBase(){
         
     }
 
-    return {create, consultar}
+    async function remove(id:number) {
+        try {
+            await database.execAsync("Delete from pessoa where id = " + id)
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async function atualizar(data: ClienteDataBase) {
+        const statement = await database.prepareAsync(
+            "update pessoa set nome = $nome, telefone = $telefone, endereco = $endereco where id = $id"
+        )
+        try {
+            await statement.executeAsync({
+                $id: data.id,
+                $nome: data.nome,
+                $telefone: data.telefone,
+                $endereco: data.endereco
+
+            })
+        } catch (error) {
+            throw error
+        }finally{
+            await statement.finalizeAsync()
+        }
+
+    }
+
+    return {create, consultar, remove, atualizar}
 }// fim da function

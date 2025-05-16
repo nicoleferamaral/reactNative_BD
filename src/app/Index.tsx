@@ -27,6 +27,10 @@ export default function Index(){
                 nome, telefone, endereco
             })
             Alert.alert("Cliente cadastrado com sucesso! ID: "+ response.insertedRowId)
+           
+            setNome("")
+            setTelefone("")
+            setEndereco("")
         } catch(error){
             console.log(error)
         }
